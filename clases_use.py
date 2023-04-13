@@ -1,7 +1,7 @@
 import pickle
 from collections import UserDict
 from datetime import datetime, timedelta
-from itertools import islice
+import pathlib
 
 
 class Field:
@@ -146,6 +146,9 @@ class Record:
 
 class AddressBook(UserDict):
 
+    def __str__(self):
+        return ";\n".join([f"{k}: {v}" for k, v in self.data.items()])
+
     def add_record(self, record: Record):
         self.data[record.name.value] = record
         # return f"{self} added to adres book!"
@@ -172,8 +175,24 @@ class AddressBook(UserDict):
             yield list(self.data.values())[start_iterate: start_iterate + records_count]
             start_iterate += records_count
 
-    def __str__(self):
-        return ";\n".join([f"{k}: {v}" for k, v in self.data.items()])
+    def find_records(self, contact_data):
+
+        finded_records = []
+        for contact_name, record in self.data.items():
+            if contact_data.lower() in contact_name.lower():
+                finded_records.append(record)
+                continue
+
+            for phone in record.phones:
+                if contact_data.lower() in phone.value:
+                    finded_records.append(record)
+                    break
+
+        if finded_records:
+            return finded_records
+        else:
+            return f"Cant find any contacts with data: {contact_data}!"
+
 
     def save_to_bin(self, path="AddressBook.bin"):
         with open(path, "wb") as f:
@@ -181,8 +200,12 @@ class AddressBook(UserDict):
 
     @staticmethod
     def load_from_bin(path="AddressBook.bin"):
-        with open(path, "rb") as f:
-            return pickle.load(f)
+
+        if pathlib.Path(path).exists():
+            with open(path, "rb") as f:
+                return pickle.load(f)
+        else:
+            return AddressBook()
 
 
 if __name__ == '__main__':

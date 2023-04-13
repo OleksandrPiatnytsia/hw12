@@ -1,5 +1,4 @@
 from clases_use import AddressBook, Name, Phone, Record, Birthday
-import pickle
 
 
 def input_error(func):
@@ -154,6 +153,7 @@ def phone(*args):
     else:
         return f"There are no '{input_contact_name}' matches among contacts"
 
+
 @input_error
 def remove_record(*args):
     input_contact_name = args[0]
@@ -163,14 +163,17 @@ def remove_record(*args):
     else:
         return f"No inputted contact name!"
 
+
 @input_error
 def show_all(*args):
     records_count = args[0]
     if records_count:
         for i in CONTACT_DICT.iterator(int(records_count)):
             print(i)
-    else:
+    elif CONTACT_DICT:
         return CONTACT_DICT
+    else:
+        return f"Your address book is empty yet!"
 
 
 @input_error
@@ -202,6 +205,15 @@ def save_address_book(*args):
     CONTACT_DICT.save_to_bin()
     return f"All data is saved"
 
+@input_error
+def find_contact(*args):
+    inputed_contact_data = args[0]
+
+    if inputed_contact_data:
+        return CONTACT_DICT.find_records(inputed_contact_data)
+    else:
+        return f"No data to find contacts!"
+
 
 def get_formated_contact(contact_name, phone):
     return f"{contact_name}: {phone}"
@@ -217,7 +229,9 @@ COMMANDS_LIST = {"hello": hello,
                  "show": show_all,
                  "exit": exit,
                  "bd": days_to_birthday,
-                 "save": save_address_book}
+                 "save": save_address_book,
+                 "find": find_contact}
+
 
 def main():
     global CONTACT_DICT
