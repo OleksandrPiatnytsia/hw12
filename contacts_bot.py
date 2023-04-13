@@ -1,4 +1,5 @@
 from clases_use import AddressBook, Name, Phone, Record, Birthday
+import pickle
 
 
 def input_error(func):
@@ -14,7 +15,6 @@ def input_error(func):
             print(et)
 
     return wrapper
-
 
 
 @input_error
@@ -49,6 +49,7 @@ def hello(*args):
 @input_error
 def no_command(*args):
     return f"No such '{args[0]}' command use command 'help'"
+
 
 @input_error
 def add(*args):
@@ -153,6 +154,14 @@ def phone(*args):
     else:
         return f"There are no '{input_contact_name}' matches among contacts"
 
+@input_error
+def remove_record(*args):
+    input_contact_name = args[0]
+
+    if input_contact_name:
+        return CONTACT_DICT.del_record(input_contact_name)
+    else:
+        return f"No inputted contact name!"
 
 @input_error
 def show_all(*args):
@@ -166,7 +175,9 @@ def show_all(*args):
 
 @input_error
 def exit(*args):
+    CONTACT_DICT.save_to_bin()
     return f"Work ended"
+
 
 @input_error
 def days_to_birthday(*args):
@@ -185,38 +196,33 @@ def days_to_birthday(*args):
     else:
         return f"There are no '{input_contact_name}' matches among contacts"
 
+
+@input_error
+def save_address_book(*args):
+    CONTACT_DICT.save_to_bin()
+    return f"All data is saved"
+
+
 def get_formated_contact(contact_name, phone):
     return f"{contact_name}: {phone}"
+
 
 COMMANDS_LIST = {"hello": hello,
                  "help": help,
                  "add": add,
                  "change": change,
                  "del": remove_phone,
+                 "delrec": remove_record,
                  "phone": phone,
-                 "show all": show_all,
                  "show": show_all,
-                 "good bye": exit,
                  "exit": exit,
-                 "bd": days_to_birthday}
-
-CONTACT_DICT = AddressBook()
-
-@input_error
-def input_previosly_contacts():
-    previous_contacts = {"Bob Marley": "0967845456",
-                     "Borys Johnson": "0967845111",
-                     "Lara Croft": "0967111456",
-                     "Bred Pitt": "0961223456",
-                     "Test": "123"}
-
-    for k, v in previous_contacts.items():
-        CONTACT_DICT.add_record(Record(Name(k), Phone(v), Birthday("2020.04.30")))
-
+                 "bd": days_to_birthday,
+                 "save": save_address_book}
 
 def main():
+    global CONTACT_DICT
 
-    input_previosly_contacts()
+    CONTACT_DICT = AddressBook.load_from_bin()
 
     while True:
 

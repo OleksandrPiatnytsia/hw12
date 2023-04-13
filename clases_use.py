@@ -1,3 +1,4 @@
+import pickle
 from collections import UserDict
 from datetime import datetime, timedelta
 from itertools import islice
@@ -149,6 +150,20 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
         # return f"{self} added to adres book!"
 
+    def del_record(self, record_name: str):
+
+        record_deleted = False
+        for contact_name, record in self.data.items():
+            if record_name.lower() == contact_name.lower():
+                self.data.pop(contact_name)
+                record_deleted = True
+                break
+
+        if record_deleted:
+            return f"{record_name} deleted from adres book!"
+        else:
+            return f"Cant find contact with name: {record_name} !"
+
     def iterator(self, records_count=3):
         start_iterate = 0
         while True:
@@ -160,12 +175,25 @@ class AddressBook(UserDict):
     def __str__(self):
         return ";\n".join([f"{k}: {v}" for k, v in self.data.items()])
 
+    def save_to_bin(self, path="AddressBook.bin"):
+        with open(path, "wb") as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load_from_bin(path="AddressBook.bin"):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+
 
 if __name__ == '__main__':
-    book = AddressBook()
+    pass
+    # book = AddressBook()
+    #
+    # record1 = Record(Name("Тест1"), Phone("0960969696"))
+    # print(record1.days_to_birthday())
 
-    record1 = Record(Name("Тест1"), Phone("0960969696"))
-    print(record1.days_to_birthday())
+    # for i in dir(record1):
+    #     print(i)
 
     # record1.add_phone(Phone("987865421"))
     # print("record1: ", record1)
